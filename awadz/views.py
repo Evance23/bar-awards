@@ -11,5 +11,10 @@ def projects(request):
 
 
 
-def projectdetail(request):
+def projectdetail(request, id):
+    
+    ctx = {
+        "id": id 
+    }
+    
     return render(request, projectdetail.html)

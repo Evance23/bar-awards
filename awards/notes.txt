@@ -4,3 +4,6 @@ Models
     name
     author -fk
     category -fk
+
+
+    add image medium..cloudinary

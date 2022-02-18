@@ -53,4 +53,33 @@ class Meta:
 
 class Ratings(models.Model):
     
-    pass
+    design = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))),blank=False)
+    usability = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))),blank=False)
+    content = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))),blank=False)
+    rater = models.ForeignKey(Profile,on_delete=models.CASCADE)
+    projects=models.ForeignKey(Projects,on_delete=models.CASCADE, related_name='ratings')
+    pub_date=models.DateTimeField(auto_now_add=True)
+    design_average=models.FloatField(default=0)
+    usability_average=models.FloatField(default=0)
+    content_average=models.FloatField(default=0)
+    average_rating=models.FloatField(default=0)
+    
+    def __str__(self):
+        return self.projects
+
+    def save_rating(self):
+        self.save()
+    
+    def delete_rating(self):
+        self.delete()
+
+    @classmethod
+    def project_votes(cls,project):
+        return cls.objects.filter(projects=project)
+
+    @classmethod
+    def project_voters(cls,rater):
+        return cls.objects.filter(rater=rater)
+
+    class Meta:
+        ordering=['-pub_date']

@@ -9,7 +9,8 @@ def index(request):
 def projects(request):
     return render(request, 'projects.html')
 
-
+# adding the login required requirement @login_required(login_url='/accounts/login/')
+# def article(request, article_id):
 
 def projectdetail(request, id):
     

@@ -7,6 +7,7 @@ from django.http.response import Http404, HttpResponse
 from .models import Profile, Projects, Ratings
 import datetime as dt
 from .forms import SignupForm, AddProjectForm, RatingForm, UpdateUserForm, UpdateProfile
+from django.contrib.auth import login, authenticate
 
 # Create your views here.
 

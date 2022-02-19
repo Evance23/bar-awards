@@ -5,11 +5,21 @@ from django.http import response
 from django.http.request import HttpHeaders
 from django.http.response import Http404, HttpResponse
 from .models import Profile, Projects, Ratings
+from .email import send_welcome_email
 import datetime as dt
 from .forms import SignupForm, AddProjectForm, RatingForm, UpdateUserForm, UpdateProfile
 from django.contrib.auth import login, authenticate
 
 # Create your views here.
+
+@login_required
+def welcome_mail(request):
+  user = request.user
+  email = user.email
+  name = user.username
+  send_welcome_email(name, email)
+  return redirect(index)
+
 
 
 @login_required

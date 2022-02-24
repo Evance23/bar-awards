@@ -1,20 +1,32 @@
-{% extends 'base.html' %} {% block content %}
-<br />
-<br />
-<br />
-<br />
-<div class="jumbo">
-  <h1 class="text-center">Welcome to Awadz</h1>
-  <h2 class="text-center">You Create It, We Rate It</h2>
+{%extends 'base.html'%}
+{% load bootstrap4 %}
+
+{% block content %}
+{{block.super}}
+  <h1>Posted Projects</h1><br>
+<div class="container">
+  <div class="row">
+    {% for proj in project %}
+      <div class="col-md-4">
+        <div class="card-group">
+          <div class="card">
+            <a href="{%url 'project' proj.id%}"><img class="card-img-top" src="{{proj.image.url}}" alt="Card image cap">
+            </a>
+            <div class="card__share">
+              <a id="share" class="share-icon" href="{{proj.url}}" target="_blank"><i class="fa fa-share"></i></a>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">{{proj.project_name}}</h5>
+              <p class="card-text">{{proj.description}}</p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Posted {{proj.pub_date |timesince }} ago!</small><br>
+              <button class="btn btn-primary btn-sm"><a style="color:black" href="{%url 'project' proj.id%}">Rate Project</a></button>
+            </div>
+          </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
-<br />
-<br />
-<br />
-<br />
-<div class="container-fluid">
-  {% comment %} <a href="{% url 'signup' %}">SIgn Up</a>
-
-  <a href="{% url 'login' %}">Log In</a>
-</div> {% endcomment %}
-
 {% endblock %}

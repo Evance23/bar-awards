@@ -1,107 +1,95 @@
 from django.db import models
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import User
-from django.dispatch import receiver
-from django.db.models.signals import post_save 
+from django.db.models.deletion import CASCADE
+
+
+
 # Create your models here.
-
-
 class Profile(models.Model):
-    user=models.OneToOneField(User,on_delete=models.CASCADE, related_name='profile')
-    bio=models.TextField()
-    location=models.CharField(max_length=50)
-    email=models.EmailField()
-    url=models.URLField()
-    
+    prof_photo = CloudinaryField('image',null=True)
+    bio = models.TextField(max_length=1000, blank=True, null=True)
+    phone_number = models.CharField(max_length=10, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
+
     def __str__(self):
-        return self.user.username
-
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-      if created:
-          Profile.objects.create(user=instance)
-
-    @receiver(post_save, sender=User)
-    def save_user_profile(sender, instance, **kwargs):
-        instance.profile.save()
+        return self.bio
 
     def save_profile(self):
         self.save()
-    
-    def delete_profile(self):
-        self.delete()
-    
- 
- 
-class Projects(models.Model):
-    name=models.CharField(max_length=50)
-    description=models.TextField()
-    urls=models.URLField()
-    pub_date=models.DateTimeField(auto_now_add=True)
-    profile=models.ForeignKey(Profile,on_delete=models.CASCADE)
-    voters = models.IntegerField(default=0)
-    
+
+    def update_profile(self):
+        self.save()
+
+    @classmethod
+    def get_profile_by_user(cls, user):
+        profile = cls.objects.filter(user=user)
+        return profile
+
+
+class Project(models.Model):
+    image = CloudinaryField('image')
+    project_name = models.CharField(max_length=50)
+    description = models.TextField(max_length=2000)
+    category = models.CharField(max_length=20)
+    location = models.CharField(max_length=20)
+    url = models.URLField(max_length=60,null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
+    pub_date = models.DateTimeField(auto_now_add=True,null=True)
+    average_score = models.FloatField(default=0)
+
+    # rating = models.ForeignKey(Rating,null=True,on_delete=CASCADE)
+    #avg_rating
+
     def __str__(self):
-        return self.name
+        return self.project_name
+
+    @classmethod
+    def get_all_projects(cls):
+        projects = Project.objects.all()
+        return projects
+
+    @classmethod
+    def search_by_project_name(cls,search_term):
+        projects = cls.objects.filter(project_name__icontains=search_term)
+        return projects
+
+    @classmethod
+    def display_all_projects(cls):
+        return cls.objects.all()
 
     def save_project(self):
-     self.save()
-  
-    def delete_project(self):
-     self.delete()
-
-     def voters_num(self):
-         return self.voters.count()
-
-     @classmethod
-     def get_all_projects(cls):
-         return cls.objects.all()
-
-    @classmethod
-    def get_project(cls,id):
-        return Projects.objects.get(id=id)
-
-    @classmethod
-    def search_project(cls,name):
-        return cls.objects.filter(name__icontains=name)
-
-    @classmethod
-    def user_projects(cls,profile):
-        return cls.objects.filter(profile=profile)  
-
-class Meta:
-  ordering=['-pub_date']
-
-
-
-class Ratings(models.Model):
-    
-    design = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))),blank=False)
-    usability = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))),blank=False)
-    content = models.IntegerField(choices=list(zip(range(1, 11), range(1, 11))),blank=False)
-    rater = models.ForeignKey(Profile,on_delete=models.CASCADE)
-    projects=models.ForeignKey(Projects,on_delete=models.CASCADE, related_name='ratings')
-    pub_date=models.DateTimeField(auto_now_add=True)
-    design_average=models.FloatField(default=0)
-    usability_average=models.FloatField(default=0)
-    content_average=models.FloatField(default=0)
-    average_rating=models.FloatField(default=0)
-    
-    def __str__(self):
-        return self.projects
-
-    def save_rating(self):
         self.save()
-    
-    def delete_rating(self):
+
+    def update_project(self,project_name,description,category):
+        self.project_name = project_name,
+        self.description = description,
+        self.category = category
+        self.save()
+
+
+    class Meta:
+        ordering = ['-pub_date']
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE,null=True)
+    design_rate = models.IntegerField(default=0, blank=True, null=True)
+    usability_rate = models.IntegerField(default=0, blank=True, null=True)
+    content_rate = models.IntegerField(default=0, blank=True, null=True)
+    average = models.IntegerField(default=0, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+
+    def save_rate(self):
+        self.save()
+
+    def delete_rate(self):
         self.delete()
 
     @classmethod
-    def project_votes(cls,project):
-        return cls.objects.filter(projects=project)
+    def get_project_rates(cls):
+        return cls.objects.get_or_create()
 
-    @classmethod
-    def project_voters(cls,rater):
-        return cls.objects.filter(rater=rater)
-
-    class Meta:
-        ordering=['-pub_date']
+    

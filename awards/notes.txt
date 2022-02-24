@@ -1,9 +1,0 @@
-blocks  for styles/cpntent/scripts
-
-Models
-    name
-    author -fk
-    category -fk
-
-
-    add image medium..cloudinary

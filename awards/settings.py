@@ -11,7 +11,13 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 from decouple import config 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+import django_heroku 
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +32,7 @@ SECRET_KEY = 'django-insecure-w)17t(8tgoxzzcl(t)f%70q-@^cv5!w@k=dsq)8s!1%i$=n+_v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'awadz',
+    'bootstrap4',
+    'cloudinary'
 ]
 
 MIDDLEWARE = [
@@ -49,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'awards.urls'
@@ -87,12 +97,20 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'awadz',
-        'USER': 'evance',
-    'PASSWORD':'0701003610sue',
+        'NAME':'awards',
+        'USER': 'postgres',
+        'PASSWORD':'4543',
+        'HOST':'localhost',
+        'PORT':'5433'
     }
 }
-
+cloudinary.config(
+    cloud_name = 'dram2kpxz' ,
+    api_key= '773482387638792',
+    api_secret= 'JIP9HJKoD-v3IfXmv3cN4AnwXqo',
+)
+# Configure Django App for Heroku.
+django_heroku.settings(locals())
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -129,6 +147,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = 'login'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
